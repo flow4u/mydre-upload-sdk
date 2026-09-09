@@ -59,13 +59,11 @@ See the [Python SDK Documentation](./python/README.md) for detailed configuratio
   "DEMO_WORKSPACE": {
     "workspace_name": "dws-0001-DEMO",
     "workspace_key": "00000000-0000-0000-0000-000000000000",
-    "subscription_key": "11111111222233334444555566667777",
-    "base_url": "https://your-apim-gateway.azure-api.net/v1"
+    "subscription_key": "11111111222233334444555566667777"
   },
   "PRODUCTION_WORKSPACE": {
     "workspace_name": "dws-0002-PROD",
     "workspace_key": "88888888-8888-8888-8888-888888888888",
-    "subscription_key": "99999999888877776666555544443333",
-    "base_url": "https://your-apim-gateway.azure-api.net/v1"
+    "subscription_key": "99999999888877776666555544443333"
   }
 }
