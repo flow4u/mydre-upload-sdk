@@ -2,6 +2,10 @@
 
 `mydre-upload-sdk` provides multi-language client libraries for uploading metrics, dataframes, and files to myDRE workspaces via Azure API Management and Blob Storage.
 
+> ## Work-in-Progress & not fully tested 
+> * Documentation might not yet be up to standard: please report
+> * Scripts might have issues: please report
+
 ## Repository Layout
 
 ```text
