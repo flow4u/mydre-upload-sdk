@@ -40,6 +40,19 @@ Navigate to the Python implementation directory or install directly via `pip`:
 
 ## Installation
 
+Installation
+Using `uv`:
+
+```Bash
+# Add to a uv-managed project
+uv add "mydre-upload-sdk @ git+[https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python](https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python)"
+
+# Or install directly into current environment
+uv pip install git+[https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python](https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python)
+```
+
+Using `pip`:
+
 ```bash
 pip install "git+[https://github.com/your-org/workspace-sdk.git#subdirectory=python](https://github.com/your-org/workspace-sdk.git#subdirectory=python)"
 ```
@@ -54,20 +67,3 @@ See the [Python SDK Documentation](./python/README.md) for detailed configuratio
 *(Empty file created to maintain the directory structure in Git)*
 
 ---
-
-### Python Package Files
-
-**`/python/upload.json.template`**
-```json
-{
-  "DEMO_WORKSPACE": {
-    "workspace_name": "dws-0001-DEMO",
-    "workspace_key": "00000000-0000-0000-0000-000000000000",
-    "subscription_key": "11111111222233334444555566667777"
-  },
-  "PRODUCTION_WORKSPACE": {
-    "workspace_name": "dws-0002-PROD",
-    "workspace_key": "88888888-8888-8888-8888-888888888888",
-    "subscription_key": "99999999888877776666555544443333"
-  }
-}
