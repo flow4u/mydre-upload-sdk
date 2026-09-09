@@ -17,9 +17,9 @@ pip install -e .
 ```
 
 ## Configuration Setup
-Create an upload.json file in your project using single or multi-workspace configurations:
+Create an `upload.json` file in your project. The library automatically supplies the default `base_url` (`https://andreanl-api-management.azure-api.net/v1`), so you only need to provide your workspace credentials.
 
-### Multi-Workspace Configuration
+### Option 1: Multi-Workspace Configuration (Recommended)
 ```json
 {
   "DEMO_WORKSPACE": {
@@ -34,6 +34,16 @@ Create an upload.json file in your project using single or multi-workspace confi
   }
 }
 ```
+
+### Option 2: Single-Workspace Configuration
+```json
+{
+  "workspace_name": "dws-0001-DEMO",
+  "workspace_key": "00000000-0000-0000-0000-000000000000",
+  "subscription_key": "11111111222233334444555566667777"
+}
+```
+
 
 ## API Reference
 ### Initializing Client & Executing Uploads
