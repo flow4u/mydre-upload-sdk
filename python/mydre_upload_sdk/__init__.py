@@ -5,6 +5,7 @@ myDRE Upload SDK for Python
 from .uploader import (
     WorkspaceUploader,
     WorkspaceConfig,
+    ContainerSession,
     WorkspaceUploadError,
     APIError,
     BlobStorageError,
@@ -15,6 +16,7 @@ from .uploader import (
 __all__ = [
     "WorkspaceUploader",
     "WorkspaceConfig",
+    "ContainerSession",
     "WorkspaceUploadError",
     "APIError",
     "BlobStorageError",
