@@ -4,13 +4,29 @@ Python implementation for interacting with myDRE Workspace Upload APIs and Blob 
 
 ## Installation
 
-### Direct Installation from GitHub
+### Using `uv` (Recommended)
+
 ```bash
-pip install git+[https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python](https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python)
+# Add to a uv-managed project
+uv add "mydre-upload-sdk @ git+[https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python](https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python)"
+
+# Or install directly into active virtualenv
+uv pip install git+[https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python](https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python)
+
+# Local editable install
+git clone [https://github.com/flow4u/mydre-upload-sdk.git](https://github.com/flow4u/mydre-upload-sdk.git)
+cd mydre-upload-sdk/python
+uv pip install -e .
 ```
 
-### Local Editable Installation
+### Using `pip`
+
+
 ```bash
+# Direct Installation from GitHub
+pip install git+[https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python](https://github.com/flow4u/mydre-upload-sdk.git#subdirectory=python)
+
+# Local Editable Installation
 git clone [https://github.com/flow4u/mydre-upload-sdk.git](https://github.com/flow4u/mydre-upload-sdk.git)
 cd mydre-upload-sdk/python
 pip install -e .
