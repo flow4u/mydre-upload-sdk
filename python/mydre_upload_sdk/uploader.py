@@ -14,6 +14,8 @@ import subprocess
 import sys
 from typing import Any, Dict, Optional, Union
 
+DEFAULT_BASE_URL = "https://andreanl-api-management.azure-api.net/v1"
+
 REQUIRED_PACKAGES = {
     "requests": "requests",
     "azure.storage.blob": "azure-storage-blob",
@@ -89,11 +91,11 @@ class BlobStorageError(WorkspaceUploadError):
 
 @dataclass
 class WorkspaceConfig:
-    """Dataclass holding workspace authentication and endpoint settings."""
+    """Dataclass holding workspace authentication settings."""
     workspace_name: str
     workspace_key: str
     subscription_key: str
-    base_url: str = "https://andreanl-api-management.azure-api.net/v1"
+    base_url: str = DEFAULT_BASE_URL
 
     @classmethod
     from_dict(cls, config_dict: Dict[str, Any]) -> "WorkspaceConfig":
@@ -103,7 +105,7 @@ class WorkspaceConfig:
                 workspace_name=config_dict["workspace_name"],
                 workspace_key=config_dict["workspace_key"],
                 subscription_key=config_dict["subscription_key"],
-                base_url=config_dict.get("base_url", "https://andreanl-api-management.azure-api.net/v1")
+                base_url=config_dict.get("base_url", DEFAULT_BASE_URL)
             )
         except KeyError as missing_key:
             raise ValueError(f"Missing required configuration parameter: {missing_key}") from missing_key
