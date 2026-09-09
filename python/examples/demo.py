@@ -12,57 +12,45 @@ if not os.path.exists(CONFIG_PATH):
     )
 
 with open(CONFIG_PATH, "r") as f:
-    config = json.load(f)
+    raw_config = json.load(f)
 
-# Initialize client
-uploader = WorkspaceUploader(config)
+# Handle single-workspace or multi-workspace JSON structures
+workspaces = {"DEFAULT": raw_config} if "workspace_name" in raw_config else raw_config
 
-try:
-    # 1. Test ping endpoint
-    if uploader.test_connection():
-        print("Successfully pinged workspace API.")
+for alias, config in workspaces.items():
+    print(f"\n--- Processing Workspace Alias: {alias} ---")
+    
+    if not config.get("subscription_key") or not config.get("workspace_key"):
+        print(f"Skipping '{alias}': Missing API keys.")
+        continue
 
-    # 2. List current workspace containers
-    containers = uploader.list_containers()
-    print("Active containers:", containers)
+    uploader = WorkspaceUploader(config)
 
-    # 3. Create a new temporary upload container
-    container_url = uploader.create_container(title="Automated Data Run")
-    print(f"Created container URL: {container_url}")
+    try:
+        if uploader.test_connection():
+            print("API connection active.")
 
-    # 4. Upload string content
-    uploader.upload_text(
-        container_url=container_url,
-        text_data="Pipeline completed successfully on 2026-09-09.",
-        filename="LOG.txt"
-    )
+        container_url = uploader.create_container(title=f"Batch Run ({alias})")
+        print(f"Container created: {container_url}")
 
-    # 5. Upload pandas DataFrame
-    df = pd.DataFrame({
-        "User_ID": [10, 20, 30],
-        "Access_Level": ["Admin", "User", "User"]
-    })
-    uploader.upload_dataframe(
-        container_url=container_url,
-        df=df,
-        filename="users_summary.csv"
-    )
+        uploader.upload_text(
+            container_url=container_url,
+            text_data="Dataset upload log entry.",
+            filename="LOG.txt"
+        )
 
-    # 6. Upload a local file
-    temp_file = "sample_local_doc.txt"
-    with open(temp_file, "w") as f:
-        f.write("Local sample document content.")
+        df = pd.DataFrame({
+            "Record_ID": [101, 102, 103],
+            "Status": ["Valid", "Valid", "Pending"]
+        })
+        uploader.upload_dataframe(
+            container_url=container_url,
+            df=df,
+            filename="records.csv"
+        )
 
-    uploader.upload_file(
-        container_url=container_url,
-        local_file_path=temp_file,
-        filename="sample_doc_uploaded.txt"
-    )
-    os.remove(temp_file)
+        uploader.commit_container(container_url)
+        print(f"Successfully committed data to {config['workspace_name']}.")
 
-    # 7. Commit changes to workspace
-    uploader.commit_container(container_url)
-    print("Container successfully committed!")
-
-except WorkspaceUploadError as error:
-    print(f"myDRE SDK Operation failed: {error}")
+    except WorkspaceUploadError as err:
+        print(f"Error processing workspace '{alias}': {err}")
