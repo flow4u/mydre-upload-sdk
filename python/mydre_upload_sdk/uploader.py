@@ -37,16 +37,21 @@ def verify_dependencies(auto_install: bool = True) -> None:
         return
 
     missing_str = " ".join(missing_packages)
-    install_cmd = f"{sys.executable} -m pip install {missing_str}"
 
     if auto_install:
         print(f"[myDRE SDK] Missing dependencies detected: {', '.join(missing_packages)}.")
-        print("[myDRE SDK] Attempting automatic pip installation...")
+        print("[myDRE SDK] Attempting automatic package installation...")
         try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install"] + missing_packages)
+            # Detect uv if present, otherwise fall back to python -m pip
+            if subprocess.run(["uv", "--version"], capture_output=True).returncode == 0:
+                cmd = ["uv", "pip", "install"] + missing_packages
+            else:
+                cmd = [sys.executable, "-m", "pip", "install"] + missing_packages
+
+            subprocess.check_call(cmd)
             print("[myDRE SDK] Dependencies successfully installed.")
             return
-        except subprocess.CalledProcessError as err:
+        except Exception as err:
             print(f"[myDRE SDK] Automatic installation failed: {err}")
 
     instructions = (
@@ -56,7 +61,8 @@ def verify_dependencies(auto_install: bool = True) -> None:
         f"The myDRE Upload SDK requires the following package(s):\n"
         f"  - " + "\n  - ".join(missing_packages) + "\n\n"
         f"Install them manually using:\n"
-        f"  Terminal:      {install_cmd}\n"
+        f"  uv:            uv pip install {missing_str}\n"
+        f"  pip:           {sys.executable} -m pip install {missing_str}\n"
         f"  Jupyter/Colab: !pip install {missing_str}\n"
         f"{'=' * 70}\n"
     )
