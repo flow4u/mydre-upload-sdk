@@ -8,7 +8,8 @@ from .uploader import (
     WorkspaceUploadError,
     APIError,
     BlobStorageError,
-    verify_dependencies
+    verify_dependencies,
+    DEFAULT_BASE_URL
 )
 
 __all__ = [
@@ -18,6 +19,7 @@ __all__ = [
     "APIError",
     "BlobStorageError",
     "verify_dependencies",
+    "DEFAULT_BASE_URL",
 ]
 
 __version__ = "1.0.0"
