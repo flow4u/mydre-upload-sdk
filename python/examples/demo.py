@@ -14,7 +14,6 @@ if not os.path.exists(CONFIG_PATH):
 with open(CONFIG_PATH, "r") as f:
     raw_config = json.load(f)
 
-# Handle single-workspace or multi-workspace JSON structures
 workspaces = {"DEFAULT": raw_config} if "workspace_name" in raw_config else raw_config
 
 for alias, config in workspaces.items():
@@ -27,30 +26,22 @@ for alias, config in workspaces.items():
     uploader = WorkspaceUploader(config)
 
     try:
-        if uploader.test_connection():
-            print("API connection active.")
+        # Context manager automatically handles container creation and commit
+        with uploader.container(title=f"Batch Run ({alias})") as container:
+            print(f"Container created at: {container.container_url}")
 
-        container_url = uploader.create_container(title=f"Batch Run ({alias})")
-        print(f"Container created: {container_url}")
+            container.upload_text(
+                text_data="Dataset upload log entry.",
+                filename="LOG.txt"
+            )
 
-        uploader.upload_text(
-            container_url=container_url,
-            text_data="Dataset upload log entry.",
-            filename="LOG.txt"
-        )
+            df = pd.DataFrame({
+                "Record_ID": [101, 102, 103],
+                "Status": ["Valid", "Valid", "Pending"]
+            })
+            container.upload_dataframe(df=df, filename="records.csv")
 
-        df = pd.DataFrame({
-            "Record_ID": [101, 102, 103],
-            "Status": ["Valid", "Valid", "Pending"]
-        })
-        uploader.upload_dataframe(
-            container_url=container_url,
-            df=df,
-            filename="records.csv"
-        )
-
-        uploader.commit_container(container_url)
-        print(f"Successfully committed data to {config['workspace_name']}.")
+        print(f"Container automatically committed for workspace '{config['workspace_name']}'.")
 
     except WorkspaceUploadError as err:
         print(f"Error processing workspace '{alias}': {err}")
