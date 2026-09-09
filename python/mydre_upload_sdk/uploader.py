@@ -5,6 +5,7 @@ Workspace Uploader Module
 Handles API authentication, container lifecycle, and Azure Blob storage uploads.
 """
 
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 import importlib
@@ -42,7 +43,6 @@ def verify_dependencies(auto_install: bool = True) -> None:
         print(f"[myDRE SDK] Missing dependencies detected: {', '.join(missing_packages)}.")
         print("[myDRE SDK] Attempting automatic package installation...")
         try:
-            # Detect uv if present, otherwise fall back to python -m pip
             if subprocess.run(["uv", "--version"], capture_output=True).returncode == 0:
                 cmd = ["uv", "pip", "install"] + missing_packages
             else:
@@ -117,6 +117,42 @@ class WorkspaceConfig:
             raise ValueError(f"Missing required configuration parameter: {missing_key}") from missing_key
 
 
+class ContainerSession:
+    """Active upload session yielded inside a 'with uploader.container()' context block."""
+
+    def __init__(self, uploader: "WorkspaceUploader", container_url: str):
+        self.uploader = uploader
+        self.container_url = container_url
+        self.is_committed = False
+        self.is_deleted = False
+
+    def upload_text(self, text_data: str, filename: str = 'my_text.txt') -> None:
+        """Uploads text data into this container."""
+        self.uploader.upload_text(self.container_url, text_data, filename)
+
+    def upload_dataframe(self, df: pd.DataFrame, filename: str = 'data.csv') -> None:
+        """Uploads a pandas DataFrame into this container as a CSV."""
+        self.uploader.upload_dataframe(self.container_url, df, filename)
+
+    def upload_file(self, local_file_path: str, filename: Optional[str] = None) -> None:
+        """Uploads a local file from disk into this container."""
+        self.uploader.upload_file(self.container_url, local_file_path, filename)
+
+    def commit(self) -> requests.Response:
+        """Manually commits the container before the context exit."""
+        if not self.is_committed and not self.is_deleted:
+            res = self.uploader.commit_container(self.container_url)
+            self.is_committed = True
+            return res
+
+    def delete(self) -> requests.Response:
+        """Manually cancels/deletes the container before the context exit."""
+        if not self.is_committed and not self.is_deleted:
+            res = self.uploader.delete_container(self.container_url)
+            self.is_deleted = True
+            return res
+
+
 class WorkspaceUploader:
     """Client for managing upload containers and data transfers in myDRE Workspaces."""
 
@@ -153,6 +189,39 @@ class WorkspaceUploader:
                 status_code=status_code,
                 response_text=response_text
             ) from err
+
+    @contextmanager
+    def container(self, title: Optional[str] = None, commit_on_error: bool = True):
+        """Context manager to create a container, perform uploads, and guarantee completion.
+
+        Args:
+            title: Optional custom title suffix for the container.
+            commit_on_error: If True, always commits the container even if errors occur inside 
+                             the 'with' block. If False, deletes the container on error.
+
+        Yields:
+            ContainerSession: Session object providing simplified upload methods.
+        """
+        container_url = self.create_container(title=title)
+        session = ContainerSession(self, container_url)
+
+        try:
+            yield session
+            if not session.is_committed and not session.is_deleted:
+                session.commit()
+        except Exception:
+            if not session.is_committed and not session.is_deleted:
+                if commit_on_error:
+                    try:
+                        session.commit()
+                    except Exception as commit_err:
+                        print(f"[myDRE SDK] Warning: Failed to commit container after error: {commit_err}")
+                else:
+                    try:
+                        session.delete()
+                    except Exception as delete_err:
+                        print(f"[myDRE SDK] Warning: Failed to delete container after error: {delete_err}")
+            raise
 
     def test_connection(self) -> bool:
         """Tests connectivity to the workspace API."""
