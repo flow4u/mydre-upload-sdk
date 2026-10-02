@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mydre-upload-sdk",
-    version="1.0.0",
+    version="1.0.1",
     description="Python client library for myDRE Workspace uploads",
     author="anDREa Team",
     packages=find_packages(),

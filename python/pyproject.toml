@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mydre-upload-sdk"
-version = "1.0.0"
+version = "1.0.1"
 authors = [{ name = "anDREa Team" }]
 description = "Client library for workspace API file uploads."
 readme = "README.md"
