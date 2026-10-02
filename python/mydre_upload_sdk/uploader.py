@@ -104,7 +104,7 @@ class WorkspaceConfig:
     base_url: str = DEFAULT_BASE_URL
 
     @classmethod
-    from_dict(cls, config_dict: Dict[str, Any]) -> "WorkspaceConfig":
+    def from_dict(cls, config_dict: Dict[str, Any]) -> "WorkspaceConfig":
         """Constructs a WorkspaceConfig instance from a dictionary."""
         try:
             return cls(
